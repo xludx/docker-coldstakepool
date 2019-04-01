@@ -1,0 +1,13 @@
+.
+node_modules
+npm-debug.log
+data
+dist
+node_modules
+.semaphore-cache
+.DS_Store
+.circleci
+.idea
+.Trash-0
+.vscode
+.git

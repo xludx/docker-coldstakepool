@@ -1,0 +1,61 @@
+version: '3.6'
+
+services:
+  pool_init:
+    build:
+      context: ./
+      dockerfile: Dockerfile.app
+    ports:
+      - 4444:80
+    volumes:
+      - ./data/testnet:/root/coldstakepool/data/testnet
+      - ./data/particl-binaries:/root/particl-binaries/
+    #    depends_on:
+    #      - particld
+    command: bin/entrypoint.sh init
+    environment:
+      NETWORK: testnet         # testnet/mainnet/regtest
+      NAME: test
+      EMAIL: test@particl.xyz
+      COMMENT: comment
+      PASSPHRASE: changeme
+
+  pool_frontend:
+    build:
+      context: ./
+      dockerfile: Dockerfile.frontend
+    ports:
+      - 4445:3000
+#    volumes_from:
+#      - pool
+    command: bin/entrypoint.sh frontend
+    environment:
+      NETWORK: testnet
+      POOL: pool_init
+
+#    links:
+#      - particld1
+    depends_on:
+      - pool_init
+
+#  particld:
+#    image: ludx/particl:0.18.0.5rc1 # master # 0.16.2.0
+#    volumes:
+#      - ./data/particl1:/root/.particl:cached
+#    ports:
+#      - 52935:51935
+#      - 52936:51936
+#      - 52938:51938
+#    volumes_from:
+#      - pool
+#    command: entrypoint.sh particld -reindex-chainstate
+#    environment:
+#      - CONF_TESTNET=1                 # Use the test chain
+#      - CONF_RPCUSERNAME=test           # Username for JSON-RPC connections, generated unless set
+#      - CONF_RPCPASSWORD=test           # Password for JSON-RPC connections, generated unless set
+#      - CONF_PRINTTOCONSOLE=0           # Send trace/debug info to console instead of debug.log file
+#      - CONF_SERVER=1                   # Accept command line and JSON-RPC commands
+#      - CONF_RPCALLOWIP=0.0.0.0/0       # Allow JSON-RPC connections from specified source. Valid for <ip> are a single IP (e.g. 1.2.3.4), a network/netmask (e.g. 1.2.3.4/255.255.255.0) or a network/CIDR (e.g. 1.2.3.4/24).
+#      - CONF_LISTEN=1                   # Accept connections from outside (default: 1 if no -proxy or -connect)
+#      - CREATEDEFAULTMASTERKEY=true
+
